@@ -21,6 +21,24 @@ function reducer(state, action) {
   }
 }
 
+function sendMove({ game, round, move, x, y }) {
+  fetch(`/games/${game.id}/rounds/${round.id}/moves`, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "X-CSRF-Token": document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content"),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      move_type: move,
+      x,
+      y,
+    }),
+  });
+}
+
 function GameBoard({ board, onBoardSelect }) {
   return (
     <table>
@@ -47,16 +65,16 @@ function GameBoard({ board, onBoardSelect }) {
 
 export default function Board({
   game,
-  round,
   participant,
   participants,
-  boards,
+  ...initialState
 }) {
   const [state, dispatch] = useReducer(reducer, {
-    round,
     participants,
-    boards,
+    ...initialState,
   });
+
+  const { boards, round } = state;
 
   useEffect(() => {
     consumer.subscriptions.create(
@@ -84,31 +102,23 @@ export default function Board({
     );
   }, [game]);
 
-  const ownBoard = state.boards.find(
+  const ownBoard = boards.find(
     (board) => board.game_participant_id === participant.id
   );
 
-  const yourTurn = round.game_participant?.id === participant.id;
+  const yourTurn = round.game_participant_id === participant.id;
 
   const initialFlip =
     round.state === "initial" &&
     ownBoard.board.flat(2).filter((cell) => cell !== "X").length < 2;
   const onBoardSelect = (x, y) => {
     if (initialFlip && ownBoard.board[x][y] === "X") {
-      fetch(`/games/${game.id}/rounds/${round.id}/moves`, {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-          "X-CSRF-Token": document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute("content"),
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          move_type: "initial_flip",
-          x,
-          y,
-        }),
+      sendMove({
+        game,
+        round,
+        move: "initial_flip",
+        x,
+        y,
       });
     } else if (
       round.state === "in_progress" &&
@@ -117,23 +127,19 @@ export default function Board({
         round.move_state === "drawn_discard" ||
         round.move_state === "discarded_card")
     ) {
-      fetch(`/games/${game.id}/rounds/${round.id}/moves`, {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-          "X-CSRF-Token": document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute("content"),
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          move_type: "select_card",
-          x,
-          y,
-        }),
+      sendMove({
+        game,
+        round,
+        move: "select_card",
+        x,
+        y,
       });
     }
   };
+
+  const currentParticipant = participants.find(
+    (part) => part.id === round.game_participant_id
+  );
 
   return (
     <div className="flex m-4">
@@ -145,21 +151,63 @@ export default function Board({
 
         {initialFlip && <p>Flip two cards to start the round</p>}
         {round.state === "in_progress" && (
-          <p>{yourTurn ? "Your" : `${round.game_participant.name}'s`} turn</p>
+          <p>{yourTurn ? "Your" : `${currentParticipant.name}'s`} turn</p>
         )}
         {round.state === "in_progress" && (
-          <p>Current discard: {round.current_discard || "none"}</p>
+          <p>Current discard: {round.current_discard ?? "none"}</p>
         )}
         {round.state === "in_progress" &&
           yourTurn &&
           round.move_state === "move_initial" && (
-            <p>Draw a card or draw from the discard</p>
+            <>
+              <p>Draw a card or draw from the discard</p>
+              <button
+                className="py-2 px-4 mr-4 rounded border-solid border border-black"
+                onClick={() =>
+                  sendMove({
+                    game,
+                    round,
+                    move: "draw_card",
+                  })
+                }
+              >
+                Draw card
+              </button>
+              <button
+                className="py-2 px-4 rounded border-solid border border-black"
+                onClick={() =>
+                  sendMove({
+                    game,
+                    round,
+                    move: "draw_discard",
+                  })
+                }
+              >
+                Draw discard
+              </button>
+            </>
           )}
         {round.state === "in_progress" &&
           yourTurn &&
           (round.move_state === "drawn_card" ||
             round.move_state === "drawn_discard") && (
-            <p>Drew a {round.drawn_card}. Select a card to replace</p>
+            <>
+              <p>Drew a {round.drawn_card}. Select a card to replace</p>
+              {round.move_state === "drawn_card" && (
+                <button
+                  className="py-2 px-4 rounded border-solid border border-black"
+                  onClick={() =>
+                    sendMove({
+                      game,
+                      round,
+                      move: "discard_card",
+                    })
+                  }
+                >
+                  Discard card
+                </button>
+              )}
+            </>
           )}
         {round.state === "in_progress" &&
           yourTurn &&

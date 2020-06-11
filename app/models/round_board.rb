@@ -3,6 +3,6 @@ class RoundBoard < ApplicationRecord
   belongs_to :round
 
   def initial_sum
-    board.flatten.reject { |cell| cell == 'X' }.reduce(:+)
+    board.flatten.reject { |cell| cell == 'X' }.reduce(:+) || 0
   end
 end

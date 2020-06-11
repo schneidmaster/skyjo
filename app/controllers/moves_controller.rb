@@ -1,6 +1,7 @@
 class MovesController < ApplicationController
   def create
     round = Round.find(params[:round_id])
+    game = round.game
     participant = GameParticipant.find(session[:participant_id])
     board = round.round_boards.find_by(game_participant: participant)
 
@@ -11,15 +12,15 @@ class MovesController < ApplicationController
         board.save
         ActionCable.server.broadcast("moves_#{round.game.token}", board)
 
-        if round.round_boards.all? { board.board.flatten.reject { |cell| cell == 'X' }.count == 2 }
+        if round.round_boards.all? { |board| board.board.flatten.reject { |cell| cell == 'X' }.count == 2 }
           round.in_progress!
-          round.update(game_participant: round.round_boards.max_by(&:initial_sum))
+          round.update(game_participant: round.round_boards.max_by(&:initial_sum).game_participant)
           ActionCable.server.broadcast("rounds_#{round.game.token}", round)
         end
       end
 
     when :draw_card
-      return unless round.game_participant == participant && round.initial?
+      return unless round.game_participant == participant && round.move_initial?
       round.update(drawn_card: round.round_deck.draw, move_state: :drawn_card)
       ActionCable.server.broadcast("rounds_#{round.game.token}", round)
 
@@ -28,7 +29,7 @@ class MovesController < ApplicationController
       round.update(drawn_card: round.current_discard, current_discard: nil, move_state: :drawn_discard)
       ActionCable.server.broadcast("rounds_#{round.game.token}", round)
 
-    when :discarded_card
+    when :discard_card
       return unless round.game_participant == participant && round.drawn_card?
       round.update(drawn_card: nil, current_discard: round.drawn_card, move_state: :discarded_card)
       ActionCable.server.broadcast("rounds_#{round.game.token}", round)
@@ -54,12 +55,13 @@ class MovesController < ApplicationController
         ActionCable.server.broadcast("moves_#{round.game.token}", board)
       end
       
-      participant_idx = game.game_participants.find_index { |part| game_participant == participant }
+      participant_idx = game.game_participants.find_index { |part| part == participant }
       if participant_idx == game.game_participants.count - 1
         round.update(game_participant: game.game_participants.first)
       else
         round.update(game_participant: game.game_participants[participant_idx + 1])
       end
+      round.move_initial!
       ActionCable.server.broadcast("rounds_#{round.game.token}", round)
     end
   end
