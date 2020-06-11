@@ -1,0 +1,20 @@
+<% if @game.initial? %>
+  <% if @participant %>
+    <p>
+      Participants: <span id="participant_list"><%= @game.game_participants.map(&:name).join(", ") %></span>
+    </p>
+
+    <%= link_to "Start game", game_path(@game.token, start_game: true), method: :patch %>
+  <% else %>
+    <%= form_with model: GameParticipant.new, url: [@game, GameParticipant.new] do |f| %>
+      <%= f.text_field :name, placeholder: "Name" %>
+      <%= f.submit "Join game" %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% if @participant %>
+    participant...
+  <% else %>
+    Game has started
+  <% end %>
+<% end %>
