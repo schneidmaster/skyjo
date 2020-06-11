@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_11_013854) do
+ActiveRecord::Schema.define(version: 2020_06_11_021700) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,24 @@ ActiveRecord::Schema.define(version: 2020_06_11_013854) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "round_boards", force: :cascade do |t|
+    t.bigint "game_participant_id"
+    t.bigint "round_id"
+    t.json "board"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["game_participant_id"], name: "index_round_boards_on_game_participant_id"
+    t.index ["round_id"], name: "index_round_boards_on_round_id"
+  end
+
+  create_table "round_decks", force: :cascade do |t|
+    t.bigint "round_id"
+    t.json "deck"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["round_id"], name: "index_round_decks_on_round_id"
+  end
+
   create_table "round_scores", force: :cascade do |t|
     t.bigint "game_participant_id"
     t.bigint "round_id"
@@ -42,10 +60,16 @@ ActiveRecord::Schema.define(version: 2020_06_11_013854) do
 
   create_table "rounds", force: :cascade do |t|
     t.bigint "game_id"
+    t.bigint "game_participant_id"
     t.integer "round_number"
+    t.integer "state", default: 0
+    t.integer "move_state", default: 0
+    t.integer "drawn_card"
+    t.integer "current_discard"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["game_id"], name: "index_rounds_on_game_id"
+    t.index ["game_participant_id"], name: "index_rounds_on_game_participant_id"
   end
 
 end

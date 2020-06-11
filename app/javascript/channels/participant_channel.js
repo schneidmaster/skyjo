@@ -1,6 +1,6 @@
 import consumer from "./consumer";
 
-window.addEventListener("load", () => {
+document.addEventListener("turbolinks:load", () => {
   if (document.querySelector("#participant_list")) {
     const token = window.location.pathname.replace("/games/", "");
     consumer.subscriptions.create(
