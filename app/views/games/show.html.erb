@@ -1,5 +1,5 @@
 <% if @participant || @game.initial? %>
-  <%= react_component("App", { game: @game, rounds: @game.rounds, participant: @participant }) %>
+  <%= react_component("App", { game: @game, rounds: @game.rounds, participant: @participant }, { class: "h-full" }) %>
 <% else %>
   Game has started :(
 <% end %>

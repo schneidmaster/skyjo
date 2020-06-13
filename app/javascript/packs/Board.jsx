@@ -1,5 +1,6 @@
 import React from "react";
 import cx from "classnames";
+import { cardClass } from "./helpers";
 
 export default function Board({ board, onBoardSelect }) {
   return (
@@ -10,14 +11,13 @@ export default function Board({ board, onBoardSelect }) {
             {row.map((col, colIdx) => (
               <td
                 key={colIdx}
-                className={cx("p-4", {
-                  "cursor-pointer": onBoardSelect,
-                  "card--neutral": col === "X",
-                  "card--bad": col > 8,
-                  "card--meh": col > 4 && col <= 8,
-                  "card--good": col > 0 && col <= 4,
-                  "card--great": col <= 0,
-                })}
+                className={cx(
+                  "p-4",
+                  {
+                    "cursor-pointer": onBoardSelect,
+                  },
+                  cardClass(col)
+                )}
                 onClick={() => onBoardSelect?.(rowIdx, colIdx)}
               >
                 {col}

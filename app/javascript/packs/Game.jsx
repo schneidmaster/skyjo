@@ -4,7 +4,7 @@ import produce from "immer";
 import consumer from "../channels/consumer";
 import Board from "./Board";
 import Scoreboard from "./Scoreboard";
-import { postRequest } from "./helpers";
+import { postRequest, cardClass } from "./helpers";
 
 function compareRounds(a, b) {
   if (a.round_number < b.round_number) {
@@ -123,24 +123,50 @@ export default function Game({ game, participant, ...initialState }) {
   );
 
   return (
-    <div className="flex m-4">
-      <div className="w-1/2">
-        <div className="h-1/2 flex pb-4">
-          <div className="w-2/3">
-            <p>
-              <strong>{participant.name}</strong>
-            </p>
-            <Board board={ownBoard} onBoardSelect={onBoardSelect} />
+    <div className="flex h-full">
+      <div className="w-1/2 p-4 border-r">
+        <div className="pb-4">
+          <div className="w-full flex">
+            <div className="w-1/2">
+              <p>
+                <strong>{participant.name}</strong>
+              </p>
+              <Board board={ownBoard} onBoardSelect={onBoardSelect} />
+            </div>
+            <div className="w-1/2 flex flex-col items-center">
+              {round.state === "in_progress" && (
+                <>
+                  <p className="mb-2">Current discard:</p>
+                  {round.current_discard !== null ? (
+                    <div
+                      className={cx(
+                        "w-6 h-8 text-center pt-2",
+                        cardClass(round.current_discard)
+                      )}
+                    >
+                      {round.current_discard}
+                    </div>
+                  ) : (
+                    "none"
+                  )}
+                </>
+              )}
+            </div>
+          </div>
 
+          <div className="mt-4">
             {initialFlip && <p>Flip two cards to start the round</p>}
             {round.state === "in_progress" && (
-              <p>{yourTurn ? "Your" : `${currentParticipant.name}'s`} turn</p>
+              <p className={cx("mb-2", { "text-red font-bold": yourTurn })}>
+                {yourTurn ? "Your" : `${currentParticipant.name}'s`} turn
+                {yourTurn ? "!" : "."}
+              </p>
             )}
             {round.state === "in_progress" &&
               yourTurn &&
               round.move_state === "move_initial" && (
                 <>
-                  <p>Draw a card or draw from the discard</p>
+                  <p className="mb-2">Draw a card or draw from the discard.</p>
                   <button
                     className="py-2 px-4 mr-4 rounded border-solid border border-black"
                     onClick={() =>
@@ -172,7 +198,21 @@ export default function Game({ game, participant, ...initialState }) {
               (round.move_state === "drawn_card" ||
                 round.move_state === "drawn_discard") && (
                 <>
-                  <p>Drew a {round.drawn_card}. Select a card to replace</p>
+                  <p>Card drawn:</p>
+                  <div
+                    className={cx(
+                      "w-6 h-8 text-center mb-2 pt-2",
+                      cardClass(round.drawn_card)
+                    )}
+                  >
+                    {round.drawn_card}
+                  </div>
+                  <p className="mb-2">
+                    Select a card to replace
+                    {round.move_state === "drawn_card" &&
+                      ", or discard the drawn card"}
+                    .
+                  </p>
                   {round.move_state === "drawn_card" && (
                     <button
                       className="py-2 px-4 rounded border-solid border border-black"
@@ -192,7 +232,7 @@ export default function Game({ game, participant, ...initialState }) {
             {round.state === "in_progress" &&
               yourTurn &&
               round.move_state === "discarded_card" && (
-                <p>Select a card to flip</p>
+                <p>Select a card to flip.</p>
               )}
             {round.state === "finished" && game.state === "started" && (
               <button
@@ -204,40 +244,11 @@ export default function Game({ game, participant, ...initialState }) {
             )}
             {game.state === "finished" && <p>Game over!</p>}
           </div>
-          <div className="w-1/3">
-            {round.state === "in_progress" && (
-              <>
-                <p>Current discard:</p>
-                {round.current_discard !== null ? (
-                  <div
-                    className={cx("w-6 h-8 text-center pt-2", {
-                      "card--bad": round.current_discard > 8,
-                      "card--meh":
-                        round.current_discard > 4 && round.current_discard <= 8,
-                      "card--good":
-                        round.current_discard > 0 && round.current_discard <= 4,
-                      "card--great": round.current_discard <= 0,
-                    })}
-                  >
-                    {round.current_discard}
-                  </div>
-                ) : (
-                  "none"
-                )}
-              </>
-            )}
-          </div>
         </div>
-        <div className="h-1/2">
-          <div className="border mt-4">
-            <p>Scores</p>
-
-            <Scoreboard participants={participants} rounds={rounds} />
-          </div>
-        </div>
+        <Scoreboard participants={participants} rounds={rounds} />
       </div>
 
-      <div className="w-1/2">
+      <div className="w-1/2 p-4">
         {boards
           .filter((board) => board.game_participant_id !== participant.id)
           .map((board) => (
