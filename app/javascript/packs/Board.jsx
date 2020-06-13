@@ -63,6 +63,11 @@ function GameBoard({ board, onBoardSelect }) {
                 key={colIdx}
                 className={cx("p-4", {
                   "cursor-pointer": onBoardSelect,
+                  "card--neutral": col === "X",
+                  "card--bad": col > 8,
+                  "card--meh": col > 4 && col <= 8,
+                  "card--good": col > 0 && col <= 4,
+                  "card--great": col <= 0,
                 })}
                 onClick={() => onBoardSelect?.(rowIdx, colIdx)}
               >

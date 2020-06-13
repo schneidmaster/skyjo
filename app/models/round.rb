@@ -38,7 +38,7 @@ class Round < ApplicationRecord
       round_scores.create(game_participant: board.game_participant, score: score)
     end
 
-    min_score = round_scores.min_by(&:score)
+    min_score = round_scores.map(&:score).min
     ender_score = round_scores.find_by(game_participant: ending_participant)
     if ender_score.score > min_score
       ender_score.update(score: ender_score.score * 2)

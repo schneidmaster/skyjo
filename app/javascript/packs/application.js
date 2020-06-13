@@ -9,6 +9,8 @@ require("@rails/activestorage").start();
 require("channels");
 require("react_ujs").detectEvents();
 
+import "../../assets/stylesheets/application.css";
+
 import Board from "./Board.jsx";
 window.Board = Board;
 

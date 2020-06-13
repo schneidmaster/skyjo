@@ -58,6 +58,7 @@ class MovesController < ApplicationController
       if (col = board.completed_col)
         round.update(current_discard: board.board[0][col])
         board.remove_col!(col)
+        ActionCable.server.broadcast("moves_#{round.game.token}", board)
       end
 
       if board.board.flatten.none? { |cell| cell == 'X' }
