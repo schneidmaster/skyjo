@@ -1,5 +1,9 @@
 class GamesController < ApplicationController
-  def index; end
+  def index
+    if params[:token]
+      redirect_to game_path(params[:token])
+    end
+  end
 
   def show
     @game = Game.find_by(token: params[:id])

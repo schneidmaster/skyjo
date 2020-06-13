@@ -125,7 +125,7 @@ export default function Game({ game, participant, ...initialState }) {
   return (
     <div className="flex m-4">
       <div className="w-1/2">
-        <div className="h-1/2 flex pb-4 border-b border-solid border-black">
+        <div className="h-1/2 flex pb-4">
           <div className="w-2/3">
             <p>
               <strong>{participant.name}</strong>
@@ -228,10 +228,12 @@ export default function Game({ game, participant, ...initialState }) {
             )}
           </div>
         </div>
-        <div className="h-1/2 pt-4">
-          <p>Scores</p>
+        <div className="h-1/2">
+          <div className="border mt-4">
+            <p>Scores</p>
 
-          <Scoreboard participants={participants} rounds={rounds} />
+            <Scoreboard participants={participants} rounds={rounds} />
+          </div>
         </div>
       </div>
 

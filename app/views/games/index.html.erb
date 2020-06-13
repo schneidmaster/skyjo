@@ -1,1 +1,10 @@
-<%= link_to "New game", games_path, method: :post %>
+<div class="m-4">
+  <div class="border p-4">
+    <%= link_to "New game", games_path, method: :post, class: "py-2 px-4 rounded border-solid border border-black" %>
+  </div>
+
+  <%= form_with url: "/games", method: "get", class: "border p-4", local: true do %>
+    <%= text_field_tag :token, "", placeholder: "Game code" %>
+    <%= submit_tag "Go" %>
+  <% end %>
+</div>
