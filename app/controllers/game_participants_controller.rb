@@ -3,7 +3,7 @@ class GameParticipantsController < ApplicationController
     game = Game.find(params[:game_id])
     participant = game.game_participants.create(participant_params)
     session[:participant_id] = participant.id
-    ActionCable.server.broadcast("participants_#{game.token}", participant)
+    ActionCable.server.broadcast("games_#{game.token}", game)
     render json: participant
   end
 

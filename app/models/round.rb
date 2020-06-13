@@ -20,6 +20,10 @@ class Round < ApplicationRecord
 
   after_create :create_round_deck, :create_boards, :set_initial_discard
 
+  def as_json(**args)
+    super(args.merge(include: [:round_boards, :round_scores]))
+  end
+
   def end_round!(ending_participant)
     round_boards.each do |board|
       board.board.map! do |row|
@@ -31,6 +35,7 @@ class Round < ApplicationRecord
           end
         end
       end
+      board.save
 
       ActionCable.server.broadcast("moves_#{game.token}", board)
 
@@ -45,6 +50,11 @@ class Round < ApplicationRecord
     end
 
     finished!
+
+    if game.game_participants.any? { |participant| participant.round_scores.map(&:score).reduce(:+) > 10 }
+      game.finished!
+      ActionCable.server.broadcast("games_#{game.token}", game)
+    end
   end
 
   private

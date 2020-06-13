@@ -5,34 +5,23 @@ import Game from "./Game";
 import Lobby from "./Lobby";
 
 export default function App({
-  game,
-  participants: initialParticipants,
+  game: initialGame,
   participant: initialParticipant,
   ...rest
 }) {
+  const [game, setGame] = useState(initialGame);
   const [participant, setParticipant] = useState(initialParticipant);
-  const [participants, setParticipants] = useState(initialParticipants);
 
   useEffect(() => {
     consumer.subscriptions.create(
       { channel: "GameChannel", game_token: game.token },
       {
         received(newGame) {
-          if (game.state === "initial" && newGame.state === "started")
+          if (game.state === "initial" && newGame.state === "started") {
             window.location.reload();
-        },
-      }
-    );
-
-    consumer.subscriptions.create(
-      { channel: "ParticipantChannel", game_token: game.token },
-      {
-        received(newParticipant) {
-          setParticipants(
-            produce(participants, (draftParticipants) => {
-              draftParticipants.push(newParticipant);
-            })
-          );
+          } else {
+            setGame(newGame);
+          }
         },
       }
     );
@@ -43,18 +32,10 @@ export default function App({
       <Lobby
         game={game}
         participant={participant}
-        participants={participants}
         setParticipant={setParticipant}
       />
     );
   } else {
-    return (
-      <Game
-        game={game}
-        participant={participant}
-        participants={participants}
-        {...rest}
-      />
-    );
+    return <Game game={game} participant={participant} {...rest} />;
   }
 }

@@ -10,6 +10,10 @@ class Game < ApplicationRecord
 
   before_create :set_token
 
+  def as_json(**args)
+    super(args.merge(include: { game_participants: {}, rounds: { include: [:round_boards, :round_scores] } }))
+  end
+
   private
 
   def set_token

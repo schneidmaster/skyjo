@@ -11,18 +11,14 @@ function nextRound({ game }) {
   postRequest(`/games/${game.id}/rounds`);
 }
 
-export default function Lobby({
-  game,
-  participant,
-  participants,
-  setParticipant,
-}) {
+export default function Lobby({ game, participant, setParticipant }) {
   const [name, setName] = useState("");
 
   return (
     <div>
       <p>
-        Current participants: {participants.map((part) => part.name).join(", ")}
+        Current participants:{" "}
+        {game.game_participants.map((part) => part.name).join(", ")}
       </p>
 
       {participant && (

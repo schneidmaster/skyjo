@@ -15,24 +15,24 @@ class MovesController < ApplicationController
         if round.round_boards.all? { |board| board.board.flatten.reject { |cell| cell == 'X' }.count == 2 }
           round.in_progress!
           round.update(game_participant: round.round_boards.max_by(&:initial_sum).game_participant)
-          ActionCable.server.broadcast("rounds_#{round.game.token}", round)
+          ActionCable.server.broadcast("rounds_#{round.game.token}", game.rounds)
         end
       end
 
     when :draw_card
       return unless round.game_participant == participant && round.move_initial?
       round.update(drawn_card: round.round_deck.draw, move_state: :drawn_card)
-      ActionCable.server.broadcast("rounds_#{round.game.token}", round)
+      ActionCable.server.broadcast("rounds_#{round.game.token}", game.rounds)
 
     when :draw_discard
       return unless round.game_participant == participant && round.move_initial?
       round.update(drawn_card: round.current_discard, current_discard: nil, move_state: :drawn_discard)
-      ActionCable.server.broadcast("rounds_#{round.game.token}", round)
+      ActionCable.server.broadcast("rounds_#{round.game.token}", game.rounds)
 
     when :discard_card
       return unless round.game_participant == participant && round.drawn_card?
       round.update(drawn_card: nil, current_discard: round.drawn_card, move_state: :discarded_card)
-      ActionCable.server.broadcast("rounds_#{round.game.token}", round)
+      ActionCable.server.broadcast("rounds_#{round.game.token}", game.rounds)
 
     when :select_card
       return unless round.game_participant == participant
@@ -72,7 +72,7 @@ class MovesController < ApplicationController
         end
         round.move_initial!
       end
-      ActionCable.server.broadcast("rounds_#{round.game.token}", round.as_json(include: :round_scores))
+      ActionCable.server.broadcast("rounds_#{round.game.token}", game.rounds)
     end
   end
 end

@@ -6,8 +6,8 @@ class RoundsController < ApplicationController
       game.started!
       ActionCable.server.broadcast("games_#{game.token}", game)
     else
-      round = game.rounds.create(round_number: game.rounds.count + 1)
-      ActionCable.server.broadcast("rounds_#{round.game.token}", round.as_json(include: :round_scores))
+      game.rounds.create(round_number: game.rounds.count + 1)
+      ActionCable.server.broadcast("rounds_#{game.token}", game.rounds)
     end
   end
 end
