@@ -80,6 +80,4 @@ test:
 #
 production:
   <<: *default
-  database: skyjo_production
-  username: skyjo
-  password: <%= ENV['SKYJO_DATABASE_PASSWORD'] %>
+  database: <%= ENV['DATABASE_URL'] %>
