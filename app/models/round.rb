@@ -51,7 +51,7 @@ class Round < ApplicationRecord
 
     finished!
 
-    if game.game_participants.any? { |participant| participant.round_scores.map(&:score).reduce(:+) > 10 }
+    if game.game_participants.any? { |participant| participant.round_scores.map(&:score).reduce(:+) > 100 }
       game.finished!
       ActionCable.server.broadcast("games_#{game.token}", game)
     end
