@@ -39,6 +39,19 @@ function sendMove({ game, round, move, x, y }) {
   });
 }
 
+function nextRound({ game }) {
+  fetch(`/games/${game.id}/rounds`, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "X-CSRF-Token": document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content"),
+      "Content-Type": "application/json",
+    },
+  });
+}
+
 function GameBoard({ board, onBoardSelect }) {
   return (
     <table>
@@ -212,6 +225,14 @@ export default function Board({
         {round.state === "in_progress" &&
           yourTurn &&
           round.move_state === "discarded_card" && <p>Select a card to flip</p>}
+        {round.state === "finished" && (
+          <button
+            className="py-2 px-4 rounded border-solid border border-black"
+            onClick={() => nextRound({ game })}
+          >
+            Next round
+          </button>
+        )}
       </div>
 
       <div className="w-1/2">

@@ -2,6 +2,7 @@ class Round < ApplicationRecord
   belongs_to :game
   belongs_to :game_participant, optional: true
   has_many :round_boards
+  has_many :round_scores
   has_one :round_deck
 
   enum state: {
@@ -18,6 +19,33 @@ class Round < ApplicationRecord
   }
 
   after_create :create_round_deck, :create_boards, :set_initial_discard
+
+  def end_round!(ending_participant)
+    round_boards.each do |board|
+      board.board.map! do |row|
+        row.map! do |cell|
+          if cell == 'X'
+            round_deck.draw
+          else
+            cell
+          end
+        end
+      end
+
+      ActionCable.server.broadcast("moves_#{game.token}", board)
+
+      score = board.board.flatten.reduce(:+)
+      round_scores.create(game_participant: board.game_participant, score: score)
+    end
+
+    min_score = round_scores.min_by(&:score)
+    ender_score = round_scores.find_by(game_participant: ending_participant)
+    if ender_score.score > min_score
+      ender_score.update(score: ender_score.score * 2)
+    end
+
+    finished!
+  end
 
   private
 

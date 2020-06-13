@@ -54,15 +54,24 @@ class MovesController < ApplicationController
         board.save
         ActionCable.server.broadcast("moves_#{round.game.token}", board)
       end
-      
-      participant_idx = game.game_participants.find_index { |part| part == participant }
-      if participant_idx == game.game_participants.count - 1
-        round.update(game_participant: game.game_participants.first)
-      else
-        round.update(game_participant: game.game_participants[participant_idx + 1])
+
+      if (col = board.completed_col)
+        round.update(current_discard: board.board[0][col])
+        board.remove_col!(col)
       end
-      round.move_initial!
-      ActionCable.server.broadcast("rounds_#{round.game.token}", round)
+
+      if board.board.flatten.none? { |cell| cell == 'X' }
+        round.end_round!(participant)
+      else
+        participant_idx = game.game_participants.find_index { |part| part == participant }
+        if participant_idx == game.game_participants.count - 1
+          round.update(game_participant: game.game_participants.first)
+        else
+          round.update(game_participant: game.game_participants[participant_idx + 1])
+        end
+        round.move_initial!
+      end
+      ActionCable.server.broadcast("rounds_#{round.game.token}", round.as_json(include: :round_scores))
     end
   end
 end
