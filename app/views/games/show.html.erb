@@ -1,20 +1,5 @@
-<% if @game.initial? %>
-  <% if @participant %>
-    <p>
-      Participants: <span id="participant_list"><%= @game.game_participants.map(&:name).join(", ") %></span>
-    </p>
-
-    <%= link_to "Start game", game_rounds_path(@game.token), method: :post %>
-  <% else %>
-    <%= form_with model: GameParticipant.new, url: [@game, GameParticipant.new] do |f| %>
-      <%= f.text_field :name, placeholder: "Name" %>
-      <%= f.submit "Join game" %>
-    <% end %>
-  <% end %>
+<% if @participant || @game.initial? %>
+  <%= react_component("App", { game: @game, round: @game.rounds.last, participant: @participant, participants: @game.game_participants, boards: @game.rounds.last&.round_boards }) %>
 <% else %>
-  <% if @participant %>
-    <%= react_component("Board", { game: @game, round: @game.rounds.last, participant: @participant, participants: @game.game_participants, boards: @game.rounds.last.round_boards }) %>
-  <% else %>
-    Game has started
-  <% end %>
+  Game has started :(
 <% end %>

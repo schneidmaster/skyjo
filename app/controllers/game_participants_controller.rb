@@ -4,7 +4,7 @@ class GameParticipantsController < ApplicationController
     participant = game.game_participants.create(participant_params)
     session[:participant_id] = participant.id
     ActionCable.server.broadcast("participants_#{game.token}", participant)
-    redirect_to game_path(game.token)
+    render json: participant
   end
 
   private
