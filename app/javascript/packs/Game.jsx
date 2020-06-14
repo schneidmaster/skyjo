@@ -197,6 +197,9 @@ export default function Game({ game, participant, ...initialState }) {
 
         <div className="mx-4 p-4 border rounded flex flex-col justify-center items-center">
           {initialFlip && <p>Flip two cards to start the round.</p>}
+          {round.state === "initial" && !initialFlip && (
+            <p>Waiting on opponents to flip.</p>
+          )}
           {round.state === "in_progress" && (
             <p className={cx("mb-2", { "text-red font-bold": yourTurn })}>
               {yourTurn ? "Your" : `${currentParticipant.name}'s`} turn
