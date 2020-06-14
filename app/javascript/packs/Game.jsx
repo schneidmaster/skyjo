@@ -242,8 +242,8 @@ export default function Game({ game, participant, ...initialState }) {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col overflow-hiden">
-        <div className="flex-1 flex md:flex-wrap overflow-x-scroll md:overflow-x-hidden md:overflow-y-scroll">
+      <div className="md:flex-1 md:flex md:flex-col">
+        <div className="flex-1 flex sm-min-h-64 md:flex-wrap overflow-x-scroll">
           {boards
             .filter((board) => board.game_participant_id !== participant.id)
             .map((board) => (
@@ -262,7 +262,7 @@ export default function Game({ game, participant, ...initialState }) {
               </div>
             ))}
         </div>
-        <div className="h-48 overflow-y-scroll">
+        <div className="md:h-48 mt-4 md:mt-0 md:overflow-y-scroll">
           <Scoreboard participants={participants} rounds={rounds} />
         </div>
       </div>

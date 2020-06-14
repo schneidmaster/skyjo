@@ -11,6 +11,10 @@ body {
   .h-20 {
     height: 5rem;
   }
+
+  .sm-min-h-64 {
+    min-height: 16rem;
+  }
 }
 
 .game-board {
