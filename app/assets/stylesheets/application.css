@@ -3,25 +3,51 @@ body {
   height: 100%;
 }
 
+.game-board {
+  border-collapse: separate;
+  border-spacing: 15px;
+}
+
 .card--neutral {
-  background-color: gray;
+  background-color: #444444;
+  color: white;
+}
+
+.card--neutral_hoverable:hover {
+  background-color: #666666;
 }
 
 .card--great {
-  background-color: purple;
+  background-color: #540d6e;
   color: white;
+}
+
+.card--great_hoverable:hover {
+  background-color: #875599;
 }
 
 .card--good {
-  background-color: green;
+  background-color: #3cb371;
   color: white;
+}
+
+.card--good_hoverable:hover {
+  background-color: #8bbf8c;
 }
 
 .card--meh {
-  background-color: yellow;
+  background-color: #ffd23f;
+}
+
+.card--meh_hoverable:hover {
+  background-color: #e5bd38;
 }
 
 .card--bad {
-  background-color: red;
+  background-color: #ee4266;
   color: white;
+}
+
+.card--bad_hoverable:hover {
+  background-color: #d63b5b;
 }

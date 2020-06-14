@@ -138,10 +138,11 @@ export default function Game({ game, participant, ...initialState }) {
         <div className="pb-4">
           <div className="w-full flex">
             <div>
-              <p>
-                <strong>{participant.name}</strong>
-              </p>
-              <Board board={ownBoard} onBoardSelect={onBoardSelect} />
+              <Board
+                name={participant.name}
+                board={ownBoard}
+                onBoardSelect={onBoardSelect}
+              />
             </div>
             <div className="flex flex-col items-center m-4">
               {round.state === "in_progress" && (
@@ -150,7 +151,7 @@ export default function Game({ game, participant, ...initialState }) {
                   {round.current_discard !== null ? (
                     <div
                       className={cx(
-                        "h-12 w-8 flex justify-center items-center mt-2",
+                        "h-12 w-8 rounded shadow-inner flex justify-center items-center mt-2",
                         cardClass(round.current_discard)
                       )}
                     >
@@ -211,7 +212,7 @@ export default function Game({ game, participant, ...initialState }) {
                   <p>Card drawn:</p>
                   <div
                     className={cx(
-                      "h-12 w-8 flex justify-center items-center my-2",
+                      "h-12 w-8 rounded shadow-inner flex justify-center items-center my-2",
                       cardClass(round.drawn_card)
                     )}
                   >
@@ -263,17 +264,15 @@ export default function Game({ game, participant, ...initialState }) {
           .filter((board) => board.game_participant_id !== participant.id)
           .map((board) => (
             <div key={board.id}>
-              <p>
-                <strong>
-                  {
-                    participants.find(
-                      (participant) =>
-                        participant.id === board.game_participant_id
-                    ).name
-                  }
-                </strong>
-              </p>
-              <Board board={board} />
+              <Board
+                name={
+                  participants.find(
+                    (participant) =>
+                      participant.id === board.game_participant_id
+                  ).name
+                }
+                board={board}
+              />
             </div>
           ))}
       </div>
