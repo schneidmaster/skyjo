@@ -35,8 +35,12 @@ class Round < ApplicationRecord
           end
         end
       end
-      board.save
 
+      while (col = board.completed_col)
+        board.remove_col!(col)
+      end
+
+      board.save
       ActionCable.server.broadcast("moves_#{game.token}", board)
 
       score = board.board.flatten.reduce(:+)
