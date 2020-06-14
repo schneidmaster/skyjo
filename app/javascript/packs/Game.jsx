@@ -115,7 +115,8 @@ export default function Game({ game, participant, ...initialState }) {
         yourTurn &&
         (round.move_state === "drawn_card" ||
           round.move_state === "drawn_discard" ||
-          round.move_state === "discarded_card")
+          (round.move_state === "discarded_card" &&
+            ownBoard.board[x][y] === "X"))
       ) {
         sendMove({
           game,
