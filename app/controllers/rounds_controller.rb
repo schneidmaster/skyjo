@@ -1,7 +1,6 @@
 class RoundsController < ApplicationController
   def create
-    game = Game.find(params[:game_id])
-    game.lock!
+    game = Game.lock.find(params[:game_id])
     if game.rounds.none?
       game.rounds.create(round_number: 1)
       game.started!
