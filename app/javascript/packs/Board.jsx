@@ -12,7 +12,7 @@ export default function Board({ board, onBoardSelect }) {
               <td
                 key={colIdx}
                 className={cx(
-                  "p-4",
+                  "h-12 w-8 text-center",
                   {
                     "cursor-pointer": onBoardSelect,
                   },

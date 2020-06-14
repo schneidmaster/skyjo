@@ -134,7 +134,7 @@ export default function Game({ game, participant, ...initialState }) {
 
   return (
     <div className="flex h-full">
-      <div className="p-4 border-r">
+      <div className="p-4 border-r w-1/4">
         <div className="pb-4">
           <div className="w-full flex">
             <div>
@@ -150,7 +150,7 @@ export default function Game({ game, participant, ...initialState }) {
                   {round.current_discard !== null ? (
                     <div
                       className={cx(
-                        "w-6 h-8 text-center pt-2",
+                        "h-12 w-8 flex justify-center items-center mt-2",
                         cardClass(round.current_discard)
                       )}
                     >
@@ -211,7 +211,7 @@ export default function Game({ game, participant, ...initialState }) {
                   <p>Card drawn:</p>
                   <div
                     className={cx(
-                      "w-6 h-8 text-center mb-2 pt-2",
+                      "h-12 w-8 flex justify-center items-center my-2",
                       cardClass(round.drawn_card)
                     )}
                   >
