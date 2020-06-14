@@ -92,31 +92,41 @@ export default function Game({ game, participant, ...initialState }) {
   const initialFlip =
     round.state === "initial" &&
     ownBoard.board.flat(2).filter((cell) => cell !== "X").length < 2;
-  const onBoardSelect = (x, y) => {
-    if (initialFlip && ownBoard.board[x][y] === "X") {
-      sendMove({
-        game,
-        round,
-        move: "initial_flip",
-        x,
-        y,
-      });
-    } else if (
-      round.state === "in_progress" &&
+  let onBoardSelect;
+  if (
+    initialFlip ||
+    (round.state === "in_progress" &&
       yourTurn &&
       (round.move_state === "drawn_card" ||
         round.move_state === "drawn_discard" ||
-        round.move_state === "discarded_card")
-    ) {
-      sendMove({
-        game,
-        round,
-        move: "select_card",
-        x,
-        y,
-      });
-    }
-  };
+        round.move_state === "discarded_card"))
+  ) {
+    onBoardSelect = (x, y) => {
+      if (initialFlip && ownBoard.board[x][y] === "X") {
+        sendMove({
+          game,
+          round,
+          move: "initial_flip",
+          x,
+          y,
+        });
+      } else if (
+        round.state === "in_progress" &&
+        yourTurn &&
+        (round.move_state === "drawn_card" ||
+          round.move_state === "drawn_discard" ||
+          round.move_state === "discarded_card")
+      ) {
+        sendMove({
+          game,
+          round,
+          move: "select_card",
+          x,
+          y,
+        });
+      }
+    };
+  }
 
   const currentParticipant = participants.find(
     (part) => part.id === round.game_participant_id
@@ -124,16 +134,16 @@ export default function Game({ game, participant, ...initialState }) {
 
   return (
     <div className="flex h-full">
-      <div className="w-1/2 p-4 border-r">
+      <div className="p-4 border-r">
         <div className="pb-4">
           <div className="w-full flex">
-            <div className="w-1/2">
+            <div>
               <p>
                 <strong>{participant.name}</strong>
               </p>
               <Board board={ownBoard} onBoardSelect={onBoardSelect} />
             </div>
-            <div className="w-1/2 flex flex-col items-center">
+            <div className="flex flex-col items-center m-4">
               {round.state === "in_progress" && (
                 <>
                   <p className="mb-2">Current discard:</p>
@@ -248,7 +258,7 @@ export default function Game({ game, participant, ...initialState }) {
         <Scoreboard participants={participants} rounds={rounds} />
       </div>
 
-      <div className="w-1/2 p-4">
+      <div className="flex-1 p-4">
         {boards
           .filter((board) => board.game_participant_id !== participant.id)
           .map((board) => (
