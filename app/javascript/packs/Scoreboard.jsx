@@ -4,10 +4,10 @@ export default function Scoreboard({ rounds, participants }) {
   const scoredRounds = rounds.filter((round) => round.state === "finished");
 
   return (
-    <table className="mt-4">
+    <table className="min-w-full md:w-full">
       <thead>
         <tr>
-          <td className="border p-2 font-semibold">Round</td>
+          <td className="border border-l-0 p-2 font-semibold">Round</td>
           {participants.map((part) => (
             <td className="border p-2 font-semibold" key={part.name}>
               {part.name}
@@ -18,7 +18,7 @@ export default function Scoreboard({ rounds, participants }) {
       <tbody>
         {scoredRounds.map((round) => (
           <tr key={round.id}>
-            <td className="border p-2">{round.round_number}</td>
+            <td className="border border-l-0 p-2">{round.round_number}</td>
             {participants.map((part) => (
               <td className="border p-2" key={part.name}>
                 {
@@ -31,7 +31,7 @@ export default function Scoreboard({ rounds, participants }) {
           </tr>
         ))}
         <tr>
-          <td className="border p-2">Total</td>
+          <td className="border border-l-0 p-2">Total</td>
           {participants.map((part) => (
             <td className="border p-2" key={part.name}>
               {scoredRounds.reduce((score, round) => {

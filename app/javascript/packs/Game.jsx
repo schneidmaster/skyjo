@@ -4,7 +4,8 @@ import produce from "immer";
 import consumer from "../channels/consumer";
 import Board from "./Board";
 import Scoreboard from "./Scoreboard";
-import { postRequest, cardClass } from "./helpers";
+import Card from "./Card";
+import { postRequest } from "./helpers";
 
 function compareRounds(a, b) {
   if (a.round_number < b.round_number) {
@@ -143,24 +144,23 @@ export default function Game({ game, participant, ...initialState }) {
     (round.move_state === "move_initial" || round.move_state === "drawn_card");
 
   return (
-    <div className="flex h-full">
-      <div className="border-r w-64">
+    <div className="flex flex-col md:flex-row h-full">
+      <div className="border-r w-full md:w-64">
         <div className="flex justify-center m-4">
           <Board
             name={participant.name}
             board={ownBoard}
             onBoardSelect={onBoardSelect}
+            ownBoard
           />
         </div>
 
         <div className="m-4 p-4 border rounded flex justify-between items-center">
           <div className="flex flex-col items-center">
             <p className="text-light-gray uppercase text-xs mb-2">Deck</p>
-            <div
-              className={cx(
-                "h-12 w-8 rounded shadow-inner flex justify-center items-center card--neutral",
-                { "card--neutral_hoverable cursor-pointer": deckDrawable }
-              )}
+            <Card
+              card="X"
+              hoverable={deckDrawable}
               onClick={() =>
                 deckDrawable &&
                 sendMove({
@@ -169,17 +169,13 @@ export default function Game({ game, participant, ...initialState }) {
                   move: "draw_card",
                 })
               }
-            >
-              X
-            </div>
+            />
           </div>
           <div className="flex flex-col items-center">
             <p className="text-light-gray uppercase text-xs mb-2">Discard</p>
-            <div
-              className={cx(
-                "h-12 w-8 rounded shadow-inner flex justify-center items-center",
-                cardClass(round.current_discard, discardDrawable)
-              )}
+            <Card
+              card={round.current_discard}
+              hoverable={discardDrawable}
               onClick={() => {
                 if (round.move_state === "move_initial") {
                   sendMove({
@@ -195,13 +191,11 @@ export default function Game({ game, participant, ...initialState }) {
                   });
                 }
               }}
-            >
-              {round.current_discard}
-            </div>
+            />
           </div>
         </div>
 
-        <div className="mx-4 p-4 border rounded h-48 flex flex-col justify-center items-center">
+        <div className="mx-4 p-4 border rounded flex flex-col justify-center items-center">
           {initialFlip && <p>Flip two cards to start the round.</p>}
           {round.state === "in_progress" && (
             <p className={cx("mb-2", { "text-red font-bold": yourTurn })}>
@@ -220,13 +214,8 @@ export default function Game({ game, participant, ...initialState }) {
               round.move_state === "drawn_discard") && (
               <>
                 <p>Card drawn:</p>
-                <div
-                  className={cx(
-                    "h-12 w-8 rounded shadow-inner flex justify-center items-center my-2",
-                    cardClass(round.drawn_card)
-                  )}
-                >
-                  {round.drawn_card}
+                <div className="my-2">
+                  <Card card={round.drawn_card} />
                 </div>
                 <p className="mb-2">
                   Select a card to replace
@@ -254,11 +243,11 @@ export default function Game({ game, participant, ...initialState }) {
       </div>
 
       <div className="flex-1 flex flex-col overflow-hiden">
-        <div className="flex-1 overflow-y-scroll">
+        <div className="flex-1 flex md:flex-wrap overflow-x-scroll md:overflow-x-hidden md:overflow-y-scroll">
           {boards
             .filter((board) => board.game_participant_id !== participant.id)
             .map((board) => (
-              <div key={board.id} className="w-64">
+              <div key={board.id} className="w-64 flex-shrink-0">
                 <div className="flex justify-center m-4">
                   <Board
                     name={
@@ -273,7 +262,7 @@ export default function Game({ game, participant, ...initialState }) {
               </div>
             ))}
         </div>
-        <div className="p-4 h-48 border-t overflow-y-scroll">
+        <div className="h-48 overflow-y-scroll">
           <Scoreboard participants={participants} rounds={rounds} />
         </div>
       </div>
