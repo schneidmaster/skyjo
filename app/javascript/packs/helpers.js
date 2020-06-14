@@ -24,6 +24,7 @@ export const cardClass = (card, hoverable) =>
     "card--meh_hoverable": card > 4 && card <= 8 && hoverable,
     "card--good": card > 0 && card <= 4,
     "card--good_hoverable": card > 0 && card <= 4 && hoverable,
-    "card--great": card <= 0,
-    "card--great_hoverable": card <= 0 && hoverable,
+    "card--great": (card ?? 1) <= 0,
+    "card--great_hoverable": (card ?? 1) <= 0 && hoverable,
+    border: card === null,
   });

@@ -133,149 +133,149 @@ export default function Game({ game, participant, ...initialState }) {
     (part) => part.id === round.game_participant_id
   );
 
+  const deckDrawable =
+    round.state === "in_progress" &&
+    yourTurn &&
+    round.move_state === "move_initial";
+  const discardDrawable =
+    round.state === "in_progress" &&
+    yourTurn &&
+    (round.move_state === "move_initial" || round.move_state === "drawn_card");
+
   return (
     <div className="flex h-full">
-      <div className="p-4 border-r w-1/4">
-        <div className="pb-4">
-          <div className="w-full flex">
-            <div>
-              <Board
-                name={participant.name}
-                board={ownBoard}
-                onBoardSelect={onBoardSelect}
-              />
-            </div>
-            <div className="flex flex-col items-center m-4">
-              {round.state === "in_progress" && (
-                <>
-                  <p className="mb-2">Current discard:</p>
-                  {round.current_discard !== null ? (
-                    <div
-                      className={cx(
-                        "h-12 w-8 rounded shadow-inner flex justify-center items-center mt-2",
-                        cardClass(round.current_discard)
-                      )}
-                    >
-                      {round.current_discard}
-                    </div>
-                  ) : (
-                    "none"
-                  )}
-                </>
+      <div className="border-r w-64">
+        <div className="flex justify-center m-4">
+          <Board
+            name={participant.name}
+            board={ownBoard}
+            onBoardSelect={onBoardSelect}
+          />
+        </div>
+
+        <div className="m-4 p-4 border rounded flex justify-between items-center">
+          <div className="flex flex-col items-center">
+            <p className="text-light-gray uppercase text-xs mb-2">Deck</p>
+            <div
+              className={cx(
+                "h-12 w-8 rounded shadow-inner flex justify-center items-center card--neutral",
+                { "card--neutral_hoverable cursor-pointer": deckDrawable }
               )}
+              onClick={() =>
+                deckDrawable &&
+                sendMove({
+                  game,
+                  round,
+                  move: "draw_card",
+                })
+              }
+            >
+              X
             </div>
           </div>
-
-          <div className="mt-4">
-            {initialFlip && <p>Flip two cards to start the round</p>}
-            {round.state === "in_progress" && (
-              <p className={cx("mb-2", { "text-red font-bold": yourTurn })}>
-                {yourTurn ? "Your" : `${currentParticipant.name}'s`} turn
-                {yourTurn ? "!" : "."}
-              </p>
-            )}
-            {round.state === "in_progress" &&
-              yourTurn &&
-              round.move_state === "move_initial" && (
-                <>
-                  <p className="mb-2">Draw a card or draw from the discard.</p>
-                  <button
-                    className="py-2 px-4 mr-4 rounded border-solid border border-black"
-                    onClick={() =>
-                      sendMove({
-                        game,
-                        round,
-                        move: "draw_card",
-                      })
-                    }
-                  >
-                    Draw card
-                  </button>
-                  <button
-                    className="py-2 px-4 rounded border-solid border border-black"
-                    onClick={() =>
-                      sendMove({
-                        game,
-                        round,
-                        move: "draw_discard",
-                      })
-                    }
-                  >
-                    Draw discard
-                  </button>
-                </>
+          <div className="flex flex-col items-center">
+            <p className="text-light-gray uppercase text-xs mb-2">Discard</p>
+            <div
+              className={cx(
+                "h-12 w-8 rounded shadow-inner flex justify-center items-center",
+                cardClass(round.current_discard, discardDrawable)
               )}
-            {round.state === "in_progress" &&
-              yourTurn &&
-              (round.move_state === "drawn_card" ||
-                round.move_state === "drawn_discard") && (
-                <>
-                  <p>Card drawn:</p>
-                  <div
-                    className={cx(
-                      "h-12 w-8 rounded shadow-inner flex justify-center items-center my-2",
-                      cardClass(round.drawn_card)
-                    )}
-                  >
-                    {round.drawn_card}
-                  </div>
-                  <p className="mb-2">
-                    Select a card to replace
-                    {round.move_state === "drawn_card" &&
-                      ", or discard the drawn card"}
-                    .
-                  </p>
-                  {round.move_state === "drawn_card" && (
-                    <button
-                      className="py-2 px-4 rounded border-solid border border-black"
-                      onClick={() =>
-                        sendMove({
-                          game,
-                          round,
-                          move: "discard_card",
-                        })
-                      }
-                    >
-                      Discard card
-                    </button>
-                  )}
-                </>
-              )}
-            {round.state === "in_progress" &&
-              yourTurn &&
-              round.move_state === "discarded_card" && (
-                <p>Select a card to flip.</p>
-              )}
-            {round.state === "finished" && game.state === "started" && (
-              <button
-                className="py-2 px-4 rounded border-solid border border-black"
-                onClick={() => nextRound({ game })}
-              >
-                Next round
-              </button>
-            )}
-            {game.state === "finished" && <p>Game over!</p>}
+              onClick={() => {
+                if (round.move_state === "move_initial") {
+                  sendMove({
+                    game,
+                    round,
+                    move: "draw_discard",
+                  });
+                } else if (round.move_state === "drawn_card") {
+                  sendMove({
+                    game,
+                    round,
+                    move: "discard_card",
+                  });
+                }
+              }}
+            >
+              {round.current_discard}
+            </div>
           </div>
         </div>
-        <Scoreboard participants={participants} rounds={rounds} />
+
+        <div className="mx-4 p-4 border rounded h-48 flex flex-col justify-center items-center">
+          {initialFlip && <p>Flip two cards to start the round.</p>}
+          {round.state === "in_progress" && (
+            <p className={cx("mb-2", { "text-red font-bold": yourTurn })}>
+              {yourTurn ? "Your" : `${currentParticipant.name}'s`} turn
+              {yourTurn ? "!" : "."}
+            </p>
+          )}
+          {round.state === "in_progress" &&
+            yourTurn &&
+            round.move_state === "move_initial" && (
+              <p className="mb-2">Draw a card or draw from the discard.</p>
+            )}
+          {round.state === "in_progress" &&
+            yourTurn &&
+            (round.move_state === "drawn_card" ||
+              round.move_state === "drawn_discard") && (
+              <>
+                <p>Card drawn:</p>
+                <div
+                  className={cx(
+                    "h-12 w-8 rounded shadow-inner flex justify-center items-center my-2",
+                    cardClass(round.drawn_card)
+                  )}
+                >
+                  {round.drawn_card}
+                </div>
+                <p className="mb-2">
+                  Select a card to replace
+                  {round.move_state === "drawn_card" &&
+                    ", or discard the drawn card"}
+                  .
+                </p>
+              </>
+            )}
+          {round.state === "in_progress" &&
+            yourTurn &&
+            round.move_state === "discarded_card" && (
+              <p>Select a card to flip.</p>
+            )}
+          {round.state === "finished" && game.state === "started" && (
+            <button
+              className="py-2 px-4 rounded border-solid border border-black"
+              onClick={() => nextRound({ game })}
+            >
+              Next round
+            </button>
+          )}
+          {game.state === "finished" && <p>Game over!</p>}
+        </div>
       </div>
 
-      <div className="flex-1 p-4">
-        {boards
-          .filter((board) => board.game_participant_id !== participant.id)
-          .map((board) => (
-            <div key={board.id}>
-              <Board
-                name={
-                  participants.find(
-                    (participant) =>
-                      participant.id === board.game_participant_id
-                  ).name
-                }
-                board={board}
-              />
-            </div>
-          ))}
+      <div className="flex-1 flex flex-col overflow-hiden">
+        <div className="flex-1 overflow-y-scroll">
+          {boards
+            .filter((board) => board.game_participant_id !== participant.id)
+            .map((board) => (
+              <div key={board.id} className="w-64">
+                <div className="flex justify-center m-4">
+                  <Board
+                    name={
+                      participants.find(
+                        (participant) =>
+                          participant.id === board.game_participant_id
+                      ).name
+                    }
+                    board={board}
+                  />
+                </div>
+              </div>
+            ))}
+        </div>
+        <div className="p-4 h-48 border-t overflow-y-scroll">
+          <Scoreboard participants={participants} rounds={rounds} />
+        </div>
       </div>
     </div>
   );
