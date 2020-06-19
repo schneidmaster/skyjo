@@ -1,10 +1,16 @@
-<div class="m-4">
-  <div class="border p-4">
-    <%= link_to "New game", games_path, method: :post, class: "py-2 px-4 rounded border-solid border border-black" %>
-  </div>
+<div class="w-full h-full flex justify-center items-center">
+  <div class="w-full md:w-1/2 h-full md:h-64 flex flex-col md:justify-between border rounded">
+    <div class="text-center p-4">
+      <h1 class="text-semibold p-4">Skyjo</h1>
+      <p>Start a new game or enter a game code to join an existing game.</p>
+    </div>
+    <div class="flex flex-col items-center lg:flex-row justify-between lg:items-end mx-8 mb-8 h-auto lg:h-12">
+      <%= link_to "New game", games_path, method: :post, class: "py-2 px-4 rounded border-solid border border-black text-black no-underline mb-4 lg:mb-0" %>
 
-  <%= form_with url: "/games", method: "get", class: "border p-4", local: true do %>
-    <%= text_field_tag :token, "", placeholder: "Game code" %>
-    <%= submit_tag "Go" %>
-  <% end %>
+      <%= form_with url: "/games", method: "get", class: "border mb-8 lg:mb-0", local: true do %>
+        <%= text_field_tag :token, "", placeholder: "Game code", class: "px-4 py-2" %>
+        <%= submit_tag "Go", class: "h-10 w-16 cursor-pointer" %>
+      <% end %>
+    </div>
+  </div>
 </div>
