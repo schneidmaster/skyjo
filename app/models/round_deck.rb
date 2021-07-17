@@ -4,9 +4,19 @@ class RoundDeck < ApplicationRecord
   before_create :shuffle_deck
 
   def draw
+    if deck.none?
+      self.deck = discard.shuffle
+      self.discard = [deck.shift]
+    end
+
     card = deck.shift
     save
     card
+  end
+
+  def discard_card(card)
+    self.discard << card
+    save
   end
 
   private
@@ -14,7 +24,7 @@ class RoundDeck < ApplicationRecord
   def shuffle_deck
     deck_array = []
 
-    num_decks = (round.round_boards.count / 8).ceil
+    num_decks = (round.game.game_participants.count.to_f / 8).ceil
 
     num_decks.times do
       5.times { deck_array << -2 }

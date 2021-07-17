@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_11_021700) do
+ActiveRecord::Schema.define(version: 2021_07_17_042622) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,6 +45,7 @@ ActiveRecord::Schema.define(version: 2020_06_11_021700) do
     t.json "deck"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.json "discard", default: []
     t.index ["round_id"], name: "index_round_decks_on_round_id"
   end
 
