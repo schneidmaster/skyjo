@@ -14,10 +14,14 @@ class RoundDeck < ApplicationRecord
   def shuffle_deck
     deck_array = []
 
-    5.times { deck_array << -2 }
+    num_decks = (round.round_boards.count / 8).ceil
 
-    (-1..12).each do |num|
-      10.times { deck_array << num }
+    num_decks.times do
+      5.times { deck_array << -2 }
+
+      (-1..12).each do |num|
+        10.times { deck_array << num }
+      end
     end
 
     self.deck = deck_array.shuffle
