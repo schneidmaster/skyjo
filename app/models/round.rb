@@ -66,18 +66,7 @@ class Round < ApplicationRecord
 
   def create_boards
     game.game_participants.each do |participant|
-      board = []
-      3.times do
-        row = []
-
-        4.times do
-          row << 'X'
-        end
-
-        board << row
-      end
-
-      round_boards.create(game_participant: participant, board: board)
+      round_boards.create(game_participant: participant)
     end
   end
 
