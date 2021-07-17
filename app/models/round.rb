@@ -19,7 +19,7 @@ class Round < ApplicationRecord
   }
 
   after_create :create_round_deck, :create_boards, :set_initial_discard
-  after_save :maybe_discard_card
+  after_save :update_round_deck_discard
 
   def as_json(**args)
     super(args.merge(include: [:round_boards, :round_scores]))
@@ -30,7 +30,7 @@ class Round < ApplicationRecord
       board.board.map! do |row|
         row.map! do |cell|
           if cell == 'X'
-            round_deck.draw
+            round_deck.draw!
           else
             cell
           end
@@ -82,13 +82,13 @@ class Round < ApplicationRecord
   end
 
   def set_initial_discard
-    update(current_discard: round_deck.draw)
+    update(current_discard: round_deck.draw!)
   end
 
-  def maybe_discard_card
+  def update_round_deck_discard
     return unless saved_change_to_current_discard?
     return if current_discard.nil?
 
-    round_deck.discard_card(current_discard)
+    round_deck.discard!(current_discard)
   end
 end

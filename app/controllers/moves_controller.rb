@@ -8,7 +8,7 @@ class MovesController < ApplicationController
     case params[:move_type].to_sym
     when :initial_flip
       if round.initial? && board.board.flatten.reject { |cell| cell == 'X' }.count < 2
-        board.board[params[:x]][params[:y]] = round.round_deck.draw
+        board.board[params[:x]][params[:y]] = round.round_deck.draw!
         board.save
         ActionCable.server.broadcast("moves_#{round.game.token}", board)
 
@@ -21,7 +21,7 @@ class MovesController < ApplicationController
 
     when :draw_card
       return unless round.game_participant == participant && round.move_initial?
-      round.update(drawn_card: round.round_deck.draw, move_state: :drawn_card)
+      round.update(drawn_card: round.round_deck.draw!, move_state: :drawn_card)
       ActionCable.server.broadcast("rounds_#{round.game.token}", game.rounds)
 
     when :draw_discard
@@ -41,7 +41,7 @@ class MovesController < ApplicationController
       if round.drawn_card? || round.drawn_discard?
         old_value =
           if board.board[params[:x]][params[:y]] == 'X'
-            round.round_deck.draw
+            round.round_deck.draw!
           else
             board.board[params[:x]][params[:y]]
           end
@@ -50,7 +50,7 @@ class MovesController < ApplicationController
         ActionCable.server.broadcast("moves_#{round.game.token}", board)
         round.update(drawn_card: nil, current_discard: old_value)
       elsif round.discarded_card?
-        board.board[params[:x]][params[:y]] = round.round_deck.draw
+        board.board[params[:x]][params[:y]] = round.round_deck.draw!
         board.save
         ActionCable.server.broadcast("moves_#{round.game.token}", board)
       end
