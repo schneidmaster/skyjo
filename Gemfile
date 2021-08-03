@@ -17,11 +17,8 @@ gem "turbolinks", "~> 5"
 gem "jbuilder", "~> 2.7"
 # Use Redis adapter to run Action Cable in production
 gem "redis", "~> 4.0"
-# Use Active Model has_secure_password
-# gem "bcrypt", "~> 3.1.7"
 
-# Use Active Storage variant
-# gem "image_processing", "~> 1.2"
+gem "json", ">= 2.0.0"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", ">= 1.4.2", require: false
@@ -44,6 +41,10 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem "spring"
   gem "spring-watcher-listen", "~> 2.0.0"
+end
+
+group :test do
+  gem "simplecov", require: false
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

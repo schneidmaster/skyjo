@@ -1,6 +1,16 @@
 require "spec_helper"
 ENV["RAILS_ENV"] ||= "test"
+
+require "simplecov"
+SimpleCov.start "rails" do
+  add_filter "/app/channels"
+  add_filter "/app/jobs"
+  add_filter "/app/mailers"
+  add_group "Services", "/app/services"
+end
+
 require File.expand_path("../config/environment", __dir__)
+Rails.application.eager_load!
 
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?

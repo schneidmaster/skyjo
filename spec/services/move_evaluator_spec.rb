@@ -237,8 +237,8 @@ RSpec.describe MoveEvaluator do
 
         context "when column is finished" do
           before do
-            board.board[0][1] = 9
-            board.board[0][2] = 9
+            board.board[1][0] = 9
+            board.board[2][0] = 9
             board.save
           end
 
@@ -248,7 +248,7 @@ RSpec.describe MoveEvaluator do
             end
             expect(board.round.move_initial?).to eq(true)
             expect(board.round.game_participant).to_not eq(board.game_participant)
-            expect(board.board.count).to eq(3)
+            expect(board.board.first.count).to eq(3)
           end
         end
 
@@ -283,8 +283,8 @@ RSpec.describe MoveEvaluator do
 
         context "when column is finished" do
           before do
-            board.board[0][1] = 8
-            board.board[0][2] = 8
+            board.board[1][0] = 8
+            board.board[2][0] = 8
             board.save
           end
 
@@ -294,7 +294,7 @@ RSpec.describe MoveEvaluator do
             end
             expect(board.round.move_initial?).to eq(true)
             expect(board.round.game_participant).to_not eq(board.game_participant)
-            expect(board.board.count).to eq(3)
+            expect(board.board.first.count).to eq(3)
           end
         end
 
